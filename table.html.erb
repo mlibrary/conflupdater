@@ -1,0 +1,27 @@
+<div class="table-wrap">
+<table class="confluenceTable">
+
+<colgroup>
+<% HEADERS.length.times do %>
+  <%= '<col/>' %>
+<% end %>
+</colgroup>
+
+<tbody>
+<tr>
+<% HEADERS.each do |name| %>
+  <%= "<th class=\"confluenceTh\">#{name}</th>" %>
+<% end %>
+</tr>
+
+<% rows.each do |row_data| %>
+  <%= "<tr>" %>
+  <% row_data.each do |value| %>
+    <%= "<td class=\"confluenceTd\">#{value}</td>" %>
+  <% end %>
+  <%= "</tr>" %>
+<% end %>
+
+</tbody>
+</table>
+</div>

@@ -1,0 +1,10 @@
+hostname1	debian jessie mysql prod www-lib macc linux
+hostname2	debian jessie prep ht macc linux
+hostname2 debian jessie mysql prod ht macc linux
+hostname2 debian jessie apache prod www-lib macc linux
+hostname2	debian jessie prep ht solr macc linux lss
+hostname2	debian jessie prep ht solr macc linux lss
+hostname2 debian jessie hatcher linux
+hostname2 debian jessie virtual dev linux
+hostname2 debian jessie apache prod www-lib linux
+hostname2	debian jessie apps macc prod solr fedora hydra linux www-lib

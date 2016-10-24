@@ -1,0 +1,9 @@
+# Ignore intellij directory
+.idea
+
+# Ignore scratch space contents
+scratch/*
+
+# Ignore logs and vim session files
+*.log
+*.sess
