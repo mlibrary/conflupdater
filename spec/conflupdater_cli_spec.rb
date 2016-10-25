@@ -17,18 +17,20 @@ describe ConflupdaterCLI do
   end
 
   context 'taghosts command' do
-    let(:taghosts_class) {class_double('Taghosts').as_stubbed_const}
-    let(:taghosts_instance) {double('taghost', update_page: nil)}
+    let(:taghosts_instance) {double('taghost', page_update: nil )}
+    let(:taghosts_class) {class_double('Taghosts', new: taghosts_instance)}
 
     it 'creates a new Taghosts instance' do
+      taghosts_class.as_stubbed_const
       expect(taghosts_class).to receive(:new)
       subject.taghosts
     end
 
-    it 'invokes #update_page of a taghost instance' do
-      expect(taghosts_instance).to receive(:update_page)
+    it 'invokes #page_update of the taghost instance' do
+      taghosts_class.as_stubbed_const
+      expect(taghosts_instance).to receive(:page_update)
       subject.taghosts
     end
-
   end
+
 end
