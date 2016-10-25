@@ -1,9 +1,14 @@
-# Ignore intellij directory
+# Intellij directory
 .idea
 
-# Ignore scratch space contents
+# Scratch space contents
 scratch/*
 
-# Ignore logs and vim session files
+# Logs and vim session files
 *.log
 *.sess
+
+# Configs
+config/*.yml
+
+.bundle

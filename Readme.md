@@ -2,15 +2,27 @@
 
 Given the source data for taghosts, update the relevant page in the Confluence wiki.
 
+## Installation
+
+Requires bundler to run the binstub
+
+```bash
+git clone https://github.com/mlibrary/conflupdater.git
+
+cd  conflupdater
+
+bundle install
+```
+
+Edit ```config/taghosts.sample.yml``` and rename to ```config/taghosts.yml```
+
 ## Use
 
 ```bash
-CONFLUENCE_URL="https://example.com/confluence/rest/api"
+bin/conflupdater help
 
-# writes update.json file
-ruby taghosts2confluence.rb
+bin/conflupdater print
 
-# posts update.json to confluence rest api
-curl -u username:password -X PUT -H 'Content-Type: application/json' -d @update.json ${CONFLUENCE_URL}"/content/6095488" | python -mjson.tool
+bin/conflupdater taghosts path/to/active-servers
 ```
 
