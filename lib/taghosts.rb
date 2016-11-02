@@ -2,7 +2,7 @@
 require 'erb'
 
 class Taghosts
-  TOP_TAGS=["quod", "ictc", "lib", "prep", "search", "www", "redhat", "lss", "windows", "mysql", "solr", "dev", "virtual", "apache", "hatcher", "ht", "macc", "prod", "jessie", "debian", "linux"].freeze
+  TOP_TAGS=["quod", "ictc", "www-lib", "prep", "search", "redhat", "lss", "windows", "mysql", "solr", "dev", "virtual", "apache", "hatcher", "ht", "macc", "prod", "jessie", "debian", "linux"].freeze
   HEADERS=["hostname"] + TOP_TAGS + ["other_tags"]
 
   attr_reader :page_id, :space_key, :page_version, :source
