@@ -38,7 +38,7 @@ class Taghosts
         "title": "Taghosts Inventory",
         "type": "page",
         "version": {
-            "number": major_version + 1
+            "number": @page_version.to_i + 1
         }
     }
   end
@@ -49,14 +49,6 @@ class Taghosts
     # emit html table formatted for confluence
     erb = ERB.new(File.read('lib/templates/table.html.erb'))
     table_html = erb.result binding
-  end
-
-  # Take major version number of a version string
-  #
-  # @param version [String] version string defaults to page_version
-  # @return [Integer] major version number
-  def major_version(version: page_version)
-    page_version.split('.').first.to_i
   end
 
   # Process source file line into table row data
