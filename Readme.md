@@ -12,9 +12,11 @@ git clone https://github.com/mlibrary/conflupdater.git
 cd  conflupdater
 
 bundle install
+
+bin/setup
 ```
 
-Edit ```config/taghosts.sample.yml``` and rename to ```config/taghosts.yml```
+Edit `config/conflupdater.yml` and fill in appropriate values.
 
 ## Use
 
@@ -23,6 +25,8 @@ bin/conflupdater help
 
 bin/conflupdater print
 
-bin/conflupdater taghosts path/to/active-servers
+bin/conflupdater pages
+
+bin/conflupdater taghosts 
 ```
 

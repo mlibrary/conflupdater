@@ -1,0 +1,18 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'pathname'
+require 'fileutils'
+
+# paths
+APP_ROOT = Pathname.new File.expand_path('../../',  __FILE__)
+CONFIG_DIR = Pathname.new File.expand_path('../../config',  __FILE__)
+
+puts "Copying config files"
+Dir.chdir CONFIG_DIR do
+  unless File.exist?("conflupdater.yml")
+    puts "copying conflupdater.yml"
+    FileUtils.cp("conflupdater.yml.sample", "conflupdater.yml")
+  end
+end
+puts "Done."
