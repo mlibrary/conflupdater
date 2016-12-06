@@ -4,6 +4,7 @@ require 'thor'
 require 'config'
 require 'json'
 require 'highline'
+require 'pathname'
 require 'pry'
 
 require_relative 'taghosts'
@@ -16,6 +17,8 @@ Signal.trap("INT"){
 }
 
 class ConflupdaterCLI < Thor
+  APP_ROOT = Pathname.new File.expand_path('../../',  __FILE__)
+
   desc "taghosts", "Update taghosts inventory page."
   def taghosts
     configure unless configured?
@@ -60,7 +63,7 @@ class ConflupdaterCLI < Thor
   end
 
   def configure
-    config_file = 'config/conflupdater.yml'
+    config_file = File.join(APP_ROOT,'config/conflupdater.yml')
     unless File.exist? config_file
       puts "Unable to read config: #{config_file}"
       exit
