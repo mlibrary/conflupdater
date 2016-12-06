@@ -8,6 +8,12 @@ require 'pry'
 
 require_relative 'taghosts'
 require_relative 'confluence_api'
+require_relative 'pages_display'
+
+Signal.trap("INT"){
+  puts "Interrupt.  Exiting."
+  exit
+}
 
 class ConflupdaterCLI < Thor
   desc "taghosts", "Update taghosts inventory page."
@@ -30,12 +36,14 @@ class ConflupdaterCLI < Thor
   desc "pages", "List pages in configured space."
   def pages
     configure unless configured?
-    # user, pass = prompt_for_credentials
+    user, pass = prompt_for_credentials
 
-    con = ConfluenceApi.new(base_url: Settings.base_url, user: Settings.user, pass: Settings.pass) 
+    con = ConfluenceApi.new(base_url: Settings.base_url, user: user, pass: pass) 
     resp = con.pages_in_space(space_key: Settings.space_key)
 
-    puts resp
+    pages = PagesDisplay.new(resp)
+
+    puts pages.to_s
   end
 
   desc "print", "Print configuration."
@@ -52,7 +60,12 @@ class ConflupdaterCLI < Thor
   end
 
   def configure
-    config_file = 'config/taghosts.yml'
+    config_file = 'config/conflupdater.yml'
+    unless File.exist? config_file
+      puts "Unable to read config: #{config_file}"
+      exit
+    end
+
     Config.load_and_set_settings(config_file)
   end
   
@@ -63,4 +76,6 @@ class ConflupdaterCLI < Thor
     pass = cli.ask("Enter Password:") { |q| q.echo = "*" }
     return [user, pass]
   end
+
 end
+

@@ -15,21 +15,20 @@ class ConfluenceApi
     @pass= pass
   end
 
-  # Get version of page.
+  # Get pages in give space.
   #
   # @param space_key [String] key uniquely identifying confluence space
   def pages_in_space(space_key: nil)
     parameters = {
       limit: 1000,
-      expand: 'restriction'
+      expand: 'children,ancestors'
     }
     target_url = @base_url + "/space/#{space_key}/content/page"
     resp = Typhoeus.get(target_url, params: parameters, userpwd: "#{@user}:#{@pass}")
 
     if resp.response_code == 200
-      binding.pry
+      r = JSON.parse(resp.body)
       results = JSON.parse(resp.body)['results']
-      results.map{|res| {id: res["id"], title: res["title"]} }
     end
   end
 
@@ -51,5 +50,4 @@ class ConfluenceApi
       result['version']['number']
     end
   end
-
 end
