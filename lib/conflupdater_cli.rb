@@ -36,6 +36,18 @@ class ConflupdaterCLI < Thor
     puts update_data.to_json
   end
 
+  desc "vulnscan", "Add or update vulnscan report."
+  def vulnscan
+    configure unless configured?
+
+    # Check if page exists
+    # Obtain Page metadata
+    # Get body content
+    # Update/Create Page
+
+    puts "Not implemented."
+  end
+
   desc "pages", "List pages in configured space."
   def pages
     configure unless configured?
