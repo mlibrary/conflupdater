@@ -11,8 +11,8 @@ describe Taghosts do
       expect(subject.page_update).to be_kind_of(Hash)
     end
 
-    it 'updates the given page version to the next major version.' do
-      expect(subject.page_update[:version][:number]).to be(subject.major_version+1)
+    it 'increments the page version.' do
+      expect(subject.page_update[:version][:number]).to be( 9 )
     end
   end
 
