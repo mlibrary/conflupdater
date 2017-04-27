@@ -1,3 +1,3 @@
 ---
-space_key: 'LAS'
+space_key: 'FOO'
 base_url: 'https://example.com:8080/confluence/rest/api'
