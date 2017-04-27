@@ -32,25 +32,6 @@ class ConfluenceApi
     end
   end
 
-  # Get version of page.
-  #
-  # @param page_title [String] title of page
-  # @param space_key [String] key uniquely identifying confluence space
-  def page_version(page_title: nil, space_key: nil)
-    parameters = {
-      title: page_title,
-      spackeKey: space_key,
-      expand: 'version,history'
-    }
-    target_url = @base_url + "/content"
-    resp = Typhoeus.get(target_url, params: parameters, userpwd: "#{@user}:#{@pass}")
-
-    if resp.response_code == 200
-      result = JSON.parse(resp.body)['results'].first
-      result['version']['number']
-    end
-  end
-
   # Get page given title and space key.
   #
   # @param page_title [String] title of page
