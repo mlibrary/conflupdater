@@ -22,6 +22,7 @@ class ConflupdaterCLI < Thor
   desc "taghosts", "Update taghosts inventory page."
   def taghosts
     configure unless configured?
+    user, pass = prompt_for_credentials
 
     # Obtain current version of page
     con = ConfluenceApi.new(base_url: Settings.base_url, user: Settings.user, pass: Settings.pass) 
@@ -36,16 +37,43 @@ class ConflupdaterCLI < Thor
     puts update_data.to_json
   end
 
-  desc "vulnscan", "Add or update vulnscan report."
-  def vulnscan
+  desc "vulnscan", "Add or update vulnscan NAME from PATH."
+  def vulnscan(name, path)
     configure unless configured?
+    user, pass = prompt_for_credentials
 
-    # Check if page exists
-    # Obtain Page metadata
+    con = ConfluenceApi.new(base_url: Settings.base_url, user: user, pass: pass) 
+
+    # Get Vulnerabilities Page
+    vuln_page_title = "Vulnerability Scans"
+    vuln_page = con.find_page_by_title(title: vuln_page_title, space_key: Settings.space_key)
+
+    if vuln_page.empty?
+      puts "Unable to find parent page: #{vuln_page_title}"
+      exit
+    end
+
+    # Get existing vulnerabilities page if extant
+    scan_page = con.find_page_by_title(title: name, space_key: Settings.space_key)
+
     # Get body content
-    # Update/Create Page
+    # Straight up read from the path
+    content = File.read(path)
 
-    puts "Not implemented."
+    if scan_page.empty?
+      # Create new child page
+      puts "creating new page"
+      result = con.new_child_page(title: name, ancestor_id: vuln_page['id'], 
+                         space_key: Settings.space_key, content: content)
+    else
+      # Update page
+      puts "updating page"
+      result = con.update_page(page: scan_page, space_key: Settings.space_key, content: content)
+    end
+    
+    # Update/Create Page
+    puts "Result: #{result}"
+    puts "End of Line"
   end
 
   desc "pages", "List pages in configured space."

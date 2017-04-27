@@ -50,4 +50,71 @@ class ConfluenceApi
       result['version']['number']
     end
   end
+
+  # curl -u admin:admin -X GET "http://localhost:8080/confluence/rest/api/content?title=myPage%20Title&spaceKey=TST&expand=history"
+  def find_page_by_title(title: nil, space_key: nil)
+    parameters = {
+      title: title,
+      spaceKey: space_key,
+      expand: 'ancestors,version'
+    }
+    target_url = @base_url + "/content"
+
+    resp = Typhoeus.get(target_url, params: parameters, userpwd: "#{@user}:#{@pass}")
+
+    hsh = JSON.parse(resp.response_body)
+
+    # Return a page hash or empty hash
+    hsh['results'].first || Hash.new
+  end
+
+  #curl -u admin:admin -X POST -H 'Content-Type: application/json' 
+  #-d'{"type":"page","title":"new page", "ancestors":[{"id":456}],
+  #"space":{"key":"TST"},"body":{"storage":{"value":"<p>This is a new page</p>","representation":"storage"}}}'
+  #http://localhost:8080/confluence/rest/api/content/ 
+  #
+  #"Vulnerability Scans" id: 13205813
+  #
+  # Post JSON blob to Confluence to create a new page as child of existing page
+  def new_child_page(title: nil, ancestor_id: nil, space_key: nil, content: '')
+    headers = {
+      'Content-Type': 'application/json'
+    }
+    data = {
+      type: 'page',
+      title: title,
+      ancestors: [{id: ancestor_id}],
+      space: {key: space_key},
+      body: {storage: {value: content, representation: "storage"}}
+    }
+
+    target_url = @base_url + "/content"
+    resp = Typhoeus.post(target_url, body: data.to_json, headers: headers, userpwd: "#{@user}:#{@pass}")
+
+    binding.pry
+
+    resp.response_code
+  end
+  
+  # curl -u admin:admin -X PUT -H 'Content-Type: application/json' -d 'content'
+  # http://localhost:8080/confluence/rest/api/content/3604482 
+  # '{"id":"3604482","type":"page","title":"new page","space":{"key":"TST"},"body":{"storage":{"value":"<p>This is the updated text for the new page</p>","representation":"storage"}},"version":{"number":2}}' 
+  # Post JSON blob to Confluence to update an existing page
+  def update_page(page: {}, space_key: nil,  content: '')
+    headers = {
+      'Content-Type': 'application/json'
+    }
+    data = {
+      id: page['id'],
+      type: 'page',
+      title: page['title'],
+      space: {key: space_key},
+      version: {number: page['version']['number'] + 1},
+      body: {storage: {value: content, representation: "storage"}}
+    }
+
+    target_url = "#{@base_url}/content/#{page['id']}" 
+    resp = Typhoeus.put(target_url, body: data.to_json, headers: headers, userpwd: "#{@user}:#{@pass}")
+    resp.response_code
+  end
 end
