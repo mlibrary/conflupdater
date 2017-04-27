@@ -19,6 +19,35 @@ Signal.trap("INT"){
 class ConflupdaterCLI < Thor
   APP_ROOT = Pathname.new File.expand_path('../../',  __FILE__)
 
+
+  desc "push TITLE PARENT SPACE PATH", 
+    "Push content to confluence."
+  long_desc <<-LONGDESC
+    `conflupdater push` will push content in file at PATH to page TITLE
+    under page PARENT in SPACE_key.
+
+    The space key can be specifed with --space_key or in the config/conflupdater.yml file.
+  LONGDESC
+  option :space_key 
+  def push(title, parent, path)
+    configure unless configured?
+    con = ConfluenceApi.new(base_url: Settings.base_url, user: Settings.user, pass: Settings.pass) 
+
+    space_key ||= options[:space_key] || Settings.space_key
+    unless space_key
+      puts "Space key needs to be provide in config or on command line"
+      exit
+    end
+
+    content = File.read(path)
+
+    result = con.update_or_create_page(title: name, parent_title: parent, 
+                                       space_key: space_key, content: content)
+
+    puts "Result: #{result}"
+    puts "End of Line"
+  end
+
   desc "taghosts PATH", "Update taghosts inventory page from source data at PATH."
   option :name,   default: "Taghosts Inventory", desc: "Title of taghosts page."
   option :parent, default: "General Articles",   desc: "Title of parent page."
@@ -46,9 +75,6 @@ class ConflupdaterCLI < Thor
     # Get body content from provided file
     content = File.read(path)
 
-    vuln_page_title = "Vulnerability Scans"
-    vuln_page = con.find_page_by_title(title: vuln_page_title, space_key: Settings.space_key)
-
     result = con.update_or_create_page(title: name, parent_title: parent, 
                                        space_key: Settings.space_key, content: content)
     
@@ -56,7 +82,7 @@ class ConflupdaterCLI < Thor
     puts "End of Line"
   end
 
-  desc "spaces", "List spaces their corresponding key."
+  desc "spaces", "List global space names and keys."
   def spaces
     configure unless configured?
     con = ConfluenceApi.new(base_url: Settings.base_url, user: Settings.user, pass: Settings.pass) 
