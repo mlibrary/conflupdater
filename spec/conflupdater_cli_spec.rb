@@ -15,22 +15,4 @@ describe ConflupdaterCLI do
       expect{subject.print}.to output(/#{config_hash}/).to_stdout
     end
   end
-
-  context 'taghosts command' do
-    let(:taghosts_instance) {double('taghost', page_update: nil )}
-    let(:taghosts_class) {class_double('Taghosts', new: taghosts_instance)}
-
-    it 'creates a new Taghosts instance' do
-      taghosts_class.as_stubbed_const
-      expect(taghosts_class).to receive(:new)
-      subject.taghosts
-    end
-
-    it 'invokes #page_update of the taghost instance' do
-      taghosts_class.as_stubbed_const
-      expect(taghosts_instance).to receive(:page_update)
-      subject.taghosts
-    end
-  end
-
 end
