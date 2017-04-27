@@ -27,6 +27,10 @@ bin/conflupdater print
 
 bin/conflupdater pages
 
-bin/conflupdater taghosts 
+bin/conflupdater find "Page Title"
+
+bin/conflupdater taghosts path/to/active-hosts
+
+bin/conflupdater vulnscan "Page Title" path/to/vuln-scan-content
 ```
 
