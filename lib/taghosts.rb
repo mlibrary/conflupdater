@@ -5,47 +5,32 @@ class Taghosts
   TOP_TAGS=["quod", "ictc", "www-lib", "prep", "search", "redhat", "lss", "windows", "mysql", "solr", "dev", "virtual", "apache", "hatcher", "ht", "macc", "prod", "jessie", "debian", "linux"].freeze
   HEADERS=["hostname"] + TOP_TAGS + ["other_tags"]
 
-  attr_reader :page_id, :space_key, :page_version, :source
+  attr :content
 
-  def initialize(page_id: nil, space_key: nil, page_version: nil, source: nil) 
-    @page_id = page_id
-    @space_key = space_key
-    @page_version = page_version
-    @source = source
+  # take source and return content for the page
+  def initialize(source: nil) 
+    @content = Taghosts.convert_content(source: source)
   end
 
-  # Create page update data from source
+  def to_s
+    @content || ''
+  end
+
+  # Convert source data to page content
   #
   # @return [Hash] Structured for json format expected by confluence.
-  def page_update
+  def self.convert_content(source: nil)
     # Read in source file into array of row_data arrays
     rows = Array.new()
     IO.foreach(source) { |line| rows << process_line(line) }
 
-    # Create update data
-    post_data = 
-    {
-        "body": {
-            "storage": {
-                "representation": "storage",
-                "value": html_content(data: rows)
-            }
-        },
-        "id": page_id,
-        "space": {
-            "key": space_key
-        },
-        "title": "Taghosts Inventory",
-        "type": "page",
-        "version": {
-            "number": @page_version.to_i + 1
-        }
-    }
+    # Use processed data
+    html_content(data: rows)
   end
 
   # Create html content
   # @return [String] html content for confluence page replacement
-  def html_content(data: Array.new)
+  def self.html_content(data: Array.new)
     # emit html table formatted for confluence
     erb = ERB.new(File.read('lib/templates/table.html.erb'))
     table_html = erb.result binding
@@ -55,7 +40,7 @@ class Taghosts
   #
   # @param line [String] whitespace delimited line from source file
   # @return [Array] table row values corresponding to table headers
-  def process_line(line)
+  def self.process_line(line)
    input_tokens = line.split(' ')
 
    # initialize row values with a space

@@ -19,30 +19,44 @@ Signal.trap("INT"){
 class ConflupdaterCLI < Thor
   APP_ROOT = Pathname.new File.expand_path('../../',  __FILE__)
 
-  desc "taghosts", "Update taghosts inventory page."
-  def taghosts
+  desc "taghosts PATH", "Update taghosts inventory page."
+  option :name
+  option :parent
+  def taghosts(path)
     configure unless configured?
-    user, pass = prompt_for_credentials
-
-    # Obtain current version of page
     con = ConfluenceApi.new(base_url: Settings.base_url, user: Settings.user, pass: Settings.pass) 
-    version = con.page_version(page_title: Settings.page_title, space_key: Settings.space_key)
 
-    # Update content of page
-    taghosts = Taghosts.new(page_id: Settings.page_id,
-                            space_key: Settings.space_key,
-                            page_version: version,
-                            source: Settings.source_file)
-    update_data = taghosts.page_update
-    puts update_data.to_json
+    # Default options name
+    name   = options[:name]   || "Taghosts Inventory"
+    parent = options[:parent] || "General Articles" 
+
+    # Parse Taghosts data to content
+    path ||= Settings.source_file
+    content = Taghosts.new(source: path)
+
+    # Obtain current page if extant
+    page = con.find_page_by_title(title: name, space_key: Settings.space_key)
+     
+    if page.empty?
+      puts "creating new page"
+      parent_page = con.find_page_by_title(title: "General Articles", space_key: Settings.space_key)
+       
+      result = con.new_child_page(title: name, ancestor_id: parent_page['id'], 
+                         space_key: Settings.space_key, content: content)
+    else
+      # Update page
+      puts "updating page"
+      result = con.update_page(page: page, space_key: Settings.space_key, content: content)
+    end
+
+    puts "Result: #{result}"
+    puts "End of Line"
   end
 
-  desc "vulnscan", "Add or update vulnscan NAME from PATH."
+  desc "vulnscan NAME PATH", "Add or update vulnscan NAME from PATH."
   def vulnscan(name, path)
     configure unless configured?
-    user, pass = prompt_for_credentials
-
-    con = ConfluenceApi.new(base_url: Settings.base_url, user: user, pass: pass) 
+    con = ConfluenceApi.new(base_url: Settings.base_url, user: Settings.user, pass: Settings.pass) 
 
     # Get Vulnerabilities Page
     vuln_page_title = "Vulnerability Scans"
@@ -56,22 +70,18 @@ class ConflupdaterCLI < Thor
     # Get existing vulnerabilities page if extant
     scan_page = con.find_page_by_title(title: name, space_key: Settings.space_key)
 
-    # Get body content
-    # Straight up read from the path
+    # Get body content from provided file
     content = File.read(path)
 
     if scan_page.empty?
-      # Create new child page
       puts "creating new page"
       result = con.new_child_page(title: name, ancestor_id: vuln_page['id'], 
                          space_key: Settings.space_key, content: content)
     else
-      # Update page
       puts "updating page"
       result = con.update_page(page: scan_page, space_key: Settings.space_key, content: content)
     end
     
-    # Update/Create Page
     puts "Result: #{result}"
     puts "End of Line"
   end
@@ -79,13 +89,9 @@ class ConflupdaterCLI < Thor
   desc "pages", "List pages in configured space."
   def pages
     configure unless configured?
-    user, pass = prompt_for_credentials
-
-    con = ConfluenceApi.new(base_url: Settings.base_url, user: user, pass: pass) 
+    con = ConfluenceApi.new(base_url: Settings.base_url, user: Settings.user, pass: Settings.pass) 
     resp = con.pages_in_space(space_key: Settings.space_key)
-
     pages = PagesDisplay.new(resp)
-
     puts pages.to_s
   end
 
@@ -110,14 +116,21 @@ class ConflupdaterCLI < Thor
     end
 
     Config.load_and_set_settings(config_file)
+    Settings.user ||= prompt_for_user
+    Settings.pass ||= prompt_for_pass
   end
   
   # get user & pass
-  def prompt_for_credentials
+  def prompt_for_user
     cli = HighLine.new
     user = cli.ask("Enter Username:")
+    return user
+  end
+
+  def prompt_for_pass
+    cli = HighLine.new
     pass = cli.ask("Enter Password:") { |q| q.echo = "*" }
-    return [user, pass]
+    return pass
   end
 
 end

@@ -51,7 +51,10 @@ class ConfluenceApi
     end
   end
 
-  # curl -u admin:admin -X GET "http://localhost:8080/confluence/rest/api/content?title=myPage%20Title&spaceKey=TST&expand=history"
+  # Get page given title and space key.
+  #
+  # @param page_title [String] title of page
+  # @param space_key [String] key uniquely identifying confluence space
   def find_page_by_title(title: nil, space_key: nil)
     parameters = {
       title: title,
@@ -68,14 +71,6 @@ class ConfluenceApi
     hsh['results'].first || Hash.new
   end
 
-  #curl -u admin:admin -X POST -H 'Content-Type: application/json' 
-  #-d'{"type":"page","title":"new page", "ancestors":[{"id":456}],
-  #"space":{"key":"TST"},"body":{"storage":{"value":"<p>This is a new page</p>","representation":"storage"}}}'
-  #http://localhost:8080/confluence/rest/api/content/ 
-  #
-  #"Vulnerability Scans" id: 13205813
-  #
-  # Post JSON blob to Confluence to create a new page as child of existing page
   def new_child_page(title: nil, ancestor_id: nil, space_key: nil, content: '')
     headers = {
       'Content-Type': 'application/json'
@@ -96,10 +91,6 @@ class ConfluenceApi
     resp.response_code
   end
   
-  # curl -u admin:admin -X PUT -H 'Content-Type: application/json' -d 'content'
-  # http://localhost:8080/confluence/rest/api/content/3604482 
-  # '{"id":"3604482","type":"page","title":"new page","space":{"key":"TST"},"body":{"storage":{"value":"<p>This is the updated text for the new page</p>","representation":"storage"}},"version":{"number":2}}' 
-  # Post JSON blob to Confluence to update an existing page
   def update_page(page: {}, space_key: nil,  content: '')
     headers = {
       'Content-Type': 'application/json'
