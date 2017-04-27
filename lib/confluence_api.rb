@@ -46,10 +46,15 @@ class ConfluenceApi
 
     resp = Typhoeus.get(target_url, params: parameters, userpwd: "#{@user}:#{@pass}")
 
-    hsh = JSON.parse(resp.response_body)
+    if resp.response_code == 401
+      puts "Unauthenticated.  User or password was incorrect?"
+      hsh = Hash.new
+    else
+      hsh = JSON.parse(resp.response_body)
+    end
 
     # Return a page hash or empty hash
-    hsh['results'].first || Hash.new
+    hsh['results']&.first || Hash.new
   end
 
   # Create new page

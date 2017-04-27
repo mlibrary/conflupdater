@@ -65,6 +65,14 @@ class ConflupdaterCLI < Thor
     puts pages.to_s
   end
 
+  desc "find", "Find page titled NAME."
+  def find(name)
+    configure unless configured?
+    con = ConfluenceApi.new(base_url: Settings.base_url, user: Settings.user, pass: Settings.pass) 
+    resp = con.find_page_by_title(title: name, space_key: Settings.space_key)
+    pp resp
+  end
+
   desc "print", "Print configuration."
   def print
     configure unless configured?
