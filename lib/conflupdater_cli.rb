@@ -19,16 +19,12 @@ Signal.trap("INT"){
 class ConflupdaterCLI < Thor
   APP_ROOT = Pathname.new File.expand_path('../../',  __FILE__)
 
-  desc "taghosts PATH", "Update taghosts inventory page."
-  option :name
-  option :parent
+  desc "taghosts PATH", "Update taghosts inventory page from source data at PATH."
+  option :name,   default: "Taghosts Inventory", desc: "Title of taghosts page."
+  option :parent, default: "General Articles",   desc: "Title of parent page."
   def taghosts(path)
     configure unless configured?
     con = ConfluenceApi.new(base_url: Settings.base_url, user: Settings.user, pass: Settings.pass) 
-
-    # Default options
-    name   = options[:name]   || "Taghosts Inventory"
-    parent = options[:parent] || "General Articles" 
 
     # Parse Taghosts data to content
     path ||= Settings.source_file
@@ -41,14 +37,11 @@ class ConflupdaterCLI < Thor
     puts "End of Line"
   end
 
-  desc "vulnscan NAME PATH", "Add or update vulnscan NAME from PATH."
-  option :parent
+  desc "vulnscan NAME PATH", "Add or update vulnscan page named NAME from content at PATH."
+  option :parent, default: "Vulnerability Scans", desc: "Title of parent page."
   def vulnscan(name, path)
     configure unless configured?
     con = ConfluenceApi.new(base_url: Settings.base_url, user: Settings.user, pass: Settings.pass) 
-
-    # Default options 
-    parent = options[:parent] || "Vulnerability Scans" 
 
     # Get body content from provided file
     content = File.read(path)
