@@ -15,6 +15,22 @@ class ConfluenceApi
     @pass= pass
   end
 
+  def spaces
+    parameters = {
+      type: 'global',
+      limit: 100
+    }
+    target_url = @base_url + "/space"
+    resp = Typhoeus.get(target_url, params: parameters, userpwd: "#{@user}:#{@pass}")
+    if resp.response_code == 200
+      r = JSON.parse(resp.body)
+      results = JSON.parse(resp.body)['results']
+    else
+      results = Array.new
+    end
+    return results
+  end
+
   # Get pages in give space.
   #
   # @param space_key [String] key uniquely identifying confluence space
@@ -83,7 +99,6 @@ class ConfluenceApi
     resp.response_code
   end
   
-
   # Update existing page
   #
   # @param page      [Hash] page data

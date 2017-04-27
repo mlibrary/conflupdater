@@ -56,6 +56,16 @@ class ConflupdaterCLI < Thor
     puts "End of Line"
   end
 
+  desc "spaces", "List spaces their corresponding key."
+  def spaces
+    configure unless configured?
+    con = ConfluenceApi.new(base_url: Settings.base_url, user: Settings.user, pass: Settings.pass) 
+    res = con.spaces
+    res.each do |space|
+      puts sprintf('%-40s %5s',space['name'], space['key'])
+    end
+  end
+
   desc "pages", "List pages in configured space."
   def pages
     configure unless configured?
