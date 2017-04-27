@@ -1,6 +1,6 @@
-# Taghosts to Confluence
+# Confluence Updater
 
-Given the source data for taghosts, update the relevant page in the Confluence wiki.
+A command line utility to easy updating confluence from regular data sources.  Originally written to update the taghosts page and the IIA vulnerability scan reports.
 
 ## Installation
 
@@ -16,7 +16,7 @@ bundle install
 bin/setup
 ```
 
-Edit `config/conflupdater.yml` and fill in appropriate values.
+Edit `config/conflupdater.yml` and fill in appropriate values for the hostname and space key.
 
 ## Use
 
