@@ -111,13 +111,13 @@ class ConfluenceApi
   def update_or_create_page(title: nil, parent_title: nil, space_key: nil, content: '')
     page = find_page_by_title(title: title, space_key: space_key)
     if page.empty?
-      puts "creating new page"
+      puts "Creating new page: name"
       parent_page = find_page_by_title(title: parent_title, space_key: Settings.space_key)
       return "No Parent: #{parent_title}" if parent_page.empty?
-      result = new_child_page(title: name, ancestor_id: parent_page['id'], 
+      result = new_child_page(title: title, ancestor_id: parent_page['id'], 
                          space_key: space_key, content: content)
     else
-      puts "updating page"
+      puts "Updating page"
       result = update_page(page: page, space_key: space_key, content: content)
     end
   end

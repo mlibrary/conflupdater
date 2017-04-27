@@ -26,7 +26,7 @@ class ConflupdaterCLI < Thor
     configure unless configured?
     con = ConfluenceApi.new(base_url: Settings.base_url, user: Settings.user, pass: Settings.pass) 
 
-    # Default options name
+    # Default options
     name   = options[:name]   || "Taghosts Inventory"
     parent = options[:parent] || "General Articles" 
 
@@ -42,33 +42,22 @@ class ConflupdaterCLI < Thor
   end
 
   desc "vulnscan NAME PATH", "Add or update vulnscan NAME from PATH."
+  option :parent
   def vulnscan(name, path)
     configure unless configured?
     con = ConfluenceApi.new(base_url: Settings.base_url, user: Settings.user, pass: Settings.pass) 
 
-    # Get Vulnerabilities Page
-    vuln_page_title = "Vulnerability Scans"
-    vuln_page = con.find_page_by_title(title: vuln_page_title, space_key: Settings.space_key)
-
-    if vuln_page.empty?
-      puts "Unable to find parent page: #{vuln_page_title}"
-      exit
-    end
-
-    # Get existing vulnerabilities page if extant
-    scan_page = con.find_page_by_title(title: name, space_key: Settings.space_key)
+    # Default options 
+    parent = options[:parent] || "Vulnerability Scans" 
 
     # Get body content from provided file
     content = File.read(path)
 
-    if scan_page.empty?
-      puts "creating new page"
-      result = con.new_child_page(title: name, ancestor_id: vuln_page['id'], 
-                         space_key: Settings.space_key, content: content)
-    else
-      puts "updating page"
-      result = con.update_page(page: scan_page, space_key: Settings.space_key, content: content)
-    end
+    vuln_page_title = "Vulnerability Scans"
+    vuln_page = con.find_page_by_title(title: vuln_page_title, space_key: Settings.space_key)
+
+    result = con.update_or_create_page(title: name, parent_title: parent, 
+                                       space_key: Settings.space_key, content: content)
     
     puts "Result: #{result}"
     puts "End of Line"
