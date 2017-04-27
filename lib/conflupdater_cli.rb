@@ -34,20 +34,8 @@ class ConflupdaterCLI < Thor
     path ||= Settings.source_file
     content = Taghosts.new(source: path)
 
-    # Obtain current page if extant
-    page = con.find_page_by_title(title: name, space_key: Settings.space_key)
-     
-    if page.empty?
-      puts "creating new page"
-      parent_page = con.find_page_by_title(title: "General Articles", space_key: Settings.space_key)
-       
-      result = con.new_child_page(title: name, ancestor_id: parent_page['id'], 
-                         space_key: Settings.space_key, content: content)
-    else
-      # Update page
-      puts "updating page"
-      result = con.update_page(page: page, space_key: Settings.space_key, content: content)
-    end
+    result = con.update_or_create_page(title: name, parent_title: parent, 
+                                       space_key: Settings.space_key, content: content)
 
     puts "Result: #{result}"
     puts "End of Line"
