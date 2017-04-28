@@ -41,7 +41,7 @@ class ConflupdaterCLI < Thor
 
     content = File.read(path)
 
-    result = con.update_or_create_page(title: name, parent_title: parent, 
+    result = con.update_or_create_page(title: title, parent_title: parent, 
                                        space_key: space_key, content: content)
 
     puts "Result: #{result}"
