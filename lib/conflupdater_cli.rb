@@ -66,16 +66,21 @@ class ConflupdaterCLI < Thor
     puts "End of Line"
   end
 
-  desc "vulnscan NAME PATH", "Add or update vulnscan page named NAME from content at PATH."
+  desc "vulnscan NAME", "Add or update vulnscan page named NAME from content at PATH."
   option :parent, default: "Vulnerability Scans", desc: "Title of parent page."
-  def vulnscan(name, path)
+  def vulnscan(name)
     configure unless configured?
     con = ConfluenceApi.new(base_url: Settings.base_url, user: Settings.user, pass: Settings.pass) 
 
     # Get body content from provided file
+    if(!Settings.vulnscan_reports_dir)
+      warn "Must set vulnscan_reports_dir in config"
+      exit 2
+    end
+    path = "#{Settings.vulnscan_reports_dir}/#{name}.xml"
     content = File.read(path)
 
-    result = con.update_or_create_page(title: name, parent_title: parent, 
+    result = con.update_or_create_page(title: name, parent_title: options.parent, 
                                        space_key: Settings.space_key, content: content)
     
     puts "Result: #{result}"

@@ -94,7 +94,7 @@ class ConfluenceApi
     target_url = @base_url + "/content"
     resp = Typhoeus.post(target_url, body: data.to_json, headers: headers, userpwd: "#{@user}:#{@pass}")
 
-    binding.pry
+    # binding.pry
 
     resp.response_code
   end
@@ -131,13 +131,13 @@ class ConfluenceApi
   def update_or_create_page(title: nil, parent_title: nil, space_key: nil, content: '')
     page = find_page_by_title(title: title, space_key: space_key)
     if page.empty?
-      puts "Creating new page: name"
+      puts "Creating new page: #{title}"
       parent_page = find_page_by_title(title: parent_title, space_key: Settings.space_key)
       return "No Parent: #{parent_title}" if parent_page.empty?
       result = new_child_page(title: title, ancestor_id: parent_page['id'], 
                          space_key: space_key, content: content)
     else
-      puts "Updating page"
+      puts "Updating page: #{title}"
       result = update_page(page: page, space_key: space_key, content: content)
     end
   end
