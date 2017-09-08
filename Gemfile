@@ -11,6 +11,9 @@ gem "highline"
 # Interacting with REST API
 gem "typhoeus"
 
+# Parsing downloaded pages
+gem "nokogiri"
+
 # Testing
 gem "rspec"
 

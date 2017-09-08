@@ -114,6 +114,40 @@ class ConflupdaterCLI < Thor
     pp resp
   end
 
+  desc "table", "On page titled NAME, dump first table we find as YAML"
+  def table(name)
+    configure unless configured?
+    con = ConfluenceApi.new(base_url: Settings.base_url, user: Settings.user, pass: Settings.pass) 
+    resp = con.find_page_content_by_title(title: name, space_key: Settings.space_key)
+    require 'nokogiri'
+    table = Nokogiri::HTML(resp).search("table").first
+    rows = table.css('tbody tr')
+    header = rows.shift
+    columns = []
+    header.children.each do |e| columns.push e.text end
+
+    data = []
+    rows.each do |r|
+      next if r.text.gsub("\u00a0"," ").strip.empty?
+      row_data = {}
+      i = 0
+      r.children.each do |e|
+        cell_data = e.text
+        cell_data = cell_data.gsub("\u00a0"," ").strip
+
+        if (columns[i][-1] == 's')
+          cell_data = cell_data.split(/\s*,\s*/)
+        end
+
+        row_data[columns[i]] = cell_data
+        i+=1
+      end
+      data.push row_data
+    end
+
+    puts data.to_yaml
+  end
+
   desc "print", "Print configuration."
   def print
     configure unless configured?

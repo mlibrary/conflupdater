@@ -73,6 +73,32 @@ class ConfluenceApi
     hsh['results']&.first || Hash.new
   end
 
+  # Get page given title and space key.
+  #
+  # @param page_title [String] title of page
+  # @param space_key [String] key uniquely identifying confluence space
+  def find_page_content_by_title(title: nil, space_key: nil)
+    parameters = {
+      title: title,
+      spaceKey: space_key,
+      expand: 'ancestors,version,body.storage'
+    }
+    target_url = @base_url + "/content"
+
+    resp = Typhoeus.get(target_url, params: parameters, userpwd: "#{@user}:#{@pass}")
+
+    if resp.response_code == 401
+      puts "Unauthenticated.  User or password was incorrect?"
+      hsh = Hash.new
+    else
+      hsh = JSON.parse(resp.response_body)
+    end
+
+    # Return page content or empty string
+    return "" unless hsh['results'][0]
+    hsh['results'][0]['body']['storage']['value']
+  end
+
   # Create new page
   #
   # @param page_title [String] title of page
