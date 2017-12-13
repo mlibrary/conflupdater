@@ -145,7 +145,7 @@ class ConflupdaterCLI < Thor
       data.push row_data
     end
 
-    puts data.to_yaml
+    puts data.to_json
   end
 
   desc "print", "Print configuration."
