@@ -114,13 +114,15 @@ class ConflupdaterCLI < Thor
     pp resp
   end
 
-  desc "table", "On page titled NAME, dump first table we find as YAML"
+  desc "table NAME", "On page titled NAME, dump table as JSON"
+  option :offset, default: "0", desc: "table offset, otherwise you get the first table"
   def table(name)
     configure unless configured?
     con = ConfluenceApi.new(base_url: Settings.base_url, user: Settings.user, pass: Settings.pass) 
     resp = con.find_page_content_by_title(title: name, space_key: Settings.space_key)
     require 'nokogiri'
-    table = Nokogiri::HTML(resp).search("table").first
+
+    table = Nokogiri::HTML(resp).search("table")[options.offset.to_i]
     rows = table.css('tbody tr')
     header = rows.shift
     columns = []
