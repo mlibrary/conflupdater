@@ -12,3 +12,6 @@ scratch/*
 config/*.yml
 
 .bundle
+
+.DS_Store
+.byebug_history

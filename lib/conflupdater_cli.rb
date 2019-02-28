@@ -98,28 +98,44 @@ class ConflupdaterCLI < Thor
   end
 
   desc "pages", "List pages in configured space."
+  option :space_key
   def pages
     configure unless configured?
     con = ConfluenceApi.new(base_url: Settings.base_url, user: Settings.user, pass: Settings.pass) 
-    resp = con.pages_in_space(space_key: Settings.space_key)
+    space_key ||= options[:space_key] || Settings.space_key
+    resp = con.pages_in_space(space_key: space_key)
     pages = PagesDisplay.new(resp)
     puts pages.to_s
   end
 
   desc "find", "Find page titled NAME."
+  option :space_key
   def find(name)
     configure unless configured?
     con = ConfluenceApi.new(base_url: Settings.base_url, user: Settings.user, pass: Settings.pass) 
-    resp = con.find_page_by_title(title: name, space_key: Settings.space_key)
+    space_key ||= options[:space_key] || Settings.space_key
+    resp = con.find_page_by_title(title: name, space_key: space_key)
     pp resp
+  end
+
+  desc "dump", "Dump confluence storage format of page titled NAME."
+  option :space_key
+  def dump(name)
+    configure unless configured?
+    con = ConfluenceApi.new(base_url: Settings.base_url, user: Settings.user, pass: Settings.pass) 
+    space_key ||= options[:space_key] || Settings.space_key
+    resp = con.find_page_content_by_title(title: name, space_key: space_key)
+    puts resp
   end
 
   desc "table NAME", "On page titled NAME, dump table as JSON"
   option :offset, default: "0", desc: "table offset, otherwise you get the first table"
+  option :space_key
   def table(name)
     configure unless configured?
-    con = ConfluenceApi.new(base_url: Settings.base_url, user: Settings.user, pass: Settings.pass) 
-    resp = con.find_page_content_by_title(title: name, space_key: Settings.space_key)
+    con = ConfluenceApi.new(base_url: Settings.base_url, user: Settings.user, pass: Settings.pass)
+    space_key ||= options[:space_key] || Settings.space_key
+    resp = con.find_page_content_by_title(title: name, space_key: space_key)
     require 'nokogiri'
 
     table = Nokogiri::HTML(resp).search("table")[options.offset.to_i]

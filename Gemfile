@@ -18,4 +18,5 @@ gem "nokogiri"
 gem "rspec"
 
 # debugging
+gem "byebug"
 gem "pry"
